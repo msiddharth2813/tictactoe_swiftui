@@ -2,7 +2,7 @@
 
 This is how I made my TicTaccToe Game
 
-## Chapter : 1 The Layout 
+##Chapter : 1 The Layout 
 
 First of all  I created a Vstack in the Vstack I added another two Vstacks inside I left the first one empty but in the second Vstack I added three additional Hstacks.
 I added these, so I can get the layout ready. In each of these Hstacks I added three buttons, so each square was tapable. Now each square was capable, but  we still need to add the lines. To do this I had a simple method 
@@ -52,7 +52,7 @@ Type this top of the Vstack that holds all the Hstacks, so this covers the top.
 
 In the first Stack type TicTacToe as a title and give it a height of 60 and any font you want.
 
-## Chapter : 2 Game Logic 
+##Chapter : 2 Game Logic 
 
 
 Now Checking if it is a Win or not to check this we need to add a func 
@@ -109,7 +109,7 @@ These varibles are really important.
 
 This is an Example of an button .
 
-          Button {
+        	  Button {
                               toggleTurn()
                               checkWin()
                            } label: {
@@ -137,5 +137,57 @@ This is an Example of an button .
 Add all of these requirements and don’t forget to add all the requirements for the label.
 Add 9 of these to create nine buttons.
 
-## Chapter : 3 Alerts
+##Chapter : 3 Alerts
 
+Now we need to show the win/lose/draw alert. 
+To do this create an alert like this
+
+                    .alert(isPresented: $showAlert, content: {
+                        Alert(title: Text(alertTitle), message: Text("Good job play again"), dismissButton: .default(Text("reset"), action: {
+                            button1ImageName = ""
+                            button2ImageName = ""
+                            button3ImageName = ""
+                            button4ImageName = ""
+                            button5ImageName = ""
+                            button6ImageName = ""
+                            button7ImageName = ""
+                            button8ImageName = ""
+                            button9ImageName = ""
+                            alertTitle = ""
+                        }))
+                    })
+                    .padding(20)
+
+In checkWin create another function.
+ 
+  func checkAlert(buttonText: String) {
+            if buttonText == Turn.cross.buttonText {
+                alertTitle = "Crosses Win"
+                crossesScore+=1
+            } else if buttonText == Turn.circle.buttonText {
+                alertTitle = "Circles Win"
+                circleScore+=1
+            } else {
+                alertTitle = "Draw"
+            }
+            showAlert = true
+        }
+
+Now when you win you should get this alert.
+Basically we are calling the alert when we either win or lose after it is called you should
+see a button reset so the game resets.
+
+This should be in your Vstack 
+Add the reset button if you didn’t 
+It is really important if you want to reset the game in the middle.
+
+                        Button {
+                            reset()
+                        } label: {
+                            Text("Reset")
+                        }
+                        Spacer()
+                        Text("TicTacToe")
+
+
+##Chapter : 4 Themes
