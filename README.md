@@ -1,8 +1,8 @@
 # tictactoe
 
-This is how I made my TicTaccToe Game
+### This is how I made my TicTaccToe Game
 
-##Chapter : 1 The Layout 
+ ## Chapter : 1 The Layout 
 
 First of all  I created a Vstack in the Vstack I added another two Vstacks inside I left the first one empty but in the second Vstack I added three additional Hstacks.
 I added these, so I can get the layout ready. In each of these Hstacks I added three buttons, so each square was tapable. Now each square was capable, but  we still need to add the lines. To do this I had a simple method 
@@ -52,7 +52,7 @@ Type this top of the Vstack that holds all the Hstacks, so this covers the top.
 
 In the first Stack type TicTacToe as a title and give it a height of 60 and any font you want.
 
-##Chapter : 2 Game Logic 
+## Chapter : 2 Game Logic 
 
 
 Now Checking if it is a Win or not to check this we need to add a func 
@@ -137,7 +137,7 @@ This is an Example of an button .
 Add all of these requirements and don’t forget to add all the requirements for the label.
 Add 9 of these to create nine buttons.
 
-##Chapter : 3 Alerts
+## Chapter : 3 Alerts
 
 Now we need to show the win/lose/draw alert. 
 To do this create an alert like this
@@ -190,4 +190,66 @@ It is really important if you want to reset the game in the middle.
                         Text("TicTacToe")
 
 
-##Chapter : 4 Themes
+## Chapter : 4 Themes
+
+ Lastly in the top level stack place This
+
+                        Menu {
+                            Menu {
+                                Button("SpiderMan") {
+                                    currentTheme = .SpiderMan
+                                    changeBackground = "SpidermanBackground"
+                                    reset()
+                                }
+                                Button("Avengers") {
+                                    currentTheme = .Avengers
+                                    changeBackground = "IronManBackground"
+                                    reset()
+                                }
+                                Button("Elements") {
+                                    currentTheme = .FireWater
+                                    changeBackground = "FireWaterBackground"
+                                    reset()
+                                }
+                                Button("HarryPotter") {
+                                    currentTheme = .HarryPotter
+                                    changeBackground = "HarryPotterBackground"
+                                    reset()
+                                }
+                                Button("Standard") {
+                                    changeBackground = "StandardBackground"
+                                    currentTheme = .standard
+                                    reset()
+                                }
+                            } label: {
+                                Label("Theme", systemImage: "folder.circle")
+                            }
+                            Button {
+                            } label: {
+                                Text("How It Works")
+                            }
+                            Button {
+                            } label: {
+                                Text("About")
+                            }
+                        } label : {
+                            Spacer()
+                            Label("", systemImage: "ellipsis.circle").padding()
+                        }
+                        Button {
+                            reset()
+                        } label: {
+                            Text("Reset")
+                        }
+                        Spacer()
+                        Text("TicTacToe")
+                            .font(.system(size: 60, weight: .black, design: .serif))
+                    }
+
+Add all this in The top level Vstack for the dropdown button and the themes, but you have to add themes in your assets. 
+
+Add this all for each buttons.
+
+button9ImageName = button9ImageName.count == 0 ? currentTurn.imageName(theme: currentTheme) : button9ImageName
+
+Change the button name too.
