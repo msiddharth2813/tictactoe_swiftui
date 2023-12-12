@@ -7,37 +7,37 @@
 First of all  I created a Vstack in the Vstack I added another two Vstacks inside I left the first one empty but in the second Vstack I added three additional Hstacks.
 I added these, so I can get the layout ready. In each of these Hstacks I added three buttons, so each square was tapable. Now each square was capable, but  we still need to add the lines. To do this I had a simple method 
 
-                            .overlay(alignment: .leading) {
-                                Divider()
-                                    .frame(maxWidth: 6, maxHeight: .infinity)
-                                    .background(Color.black)
-                            } 
+.overlay(alignment: .leading) {
+Divider()
+    .frame(maxWidth: 6, maxHeight: .infinity)
+    .background(Color.black)
+} 
 
-	This will create a line in the Left
+This will create a line in the Left
 
-                            .overlay(alignment: .topTrailing) {
-                                Divider()
-                                    .frame(maxWidth: .infinity, maxHeight:6)
-                                    .background(Color.black)
-                            }
+.overlay(alignment: .topTrailing) {
+Divider()
+    .frame(maxWidth: .infinity, maxHeight:6)
+    .background(Color.black)
+}
 
-	This will create a line in the top
+This will create a line in the top
 
-                            .overlay(alignment: .bottomTrailing) {
-                                Divider()
-                                    .frame(maxWidth: .infinity, maxHeight:6)
-                                    .background(Color.black)
-                            }
+.overlay(alignment: .bottomTrailing) {
+Divider()
+    .frame(maxWidth: .infinity, maxHeight:6)
+    .background(Color.black)
+}
 
-	This will create a line in the right
+This will create a line in the right
 
-				.overlay(alignment: .bottomLeading ) {
-                                  Divider()
-                                     .frame(maxWidth: .infinity, maxHeight:6)
-                                     .background(Color.black)
-                            } 
+.overlay(alignment: .bottomLeading ) {
+  Divider()
+     .frame(maxWidth: .infinity, maxHeight:6)
+     .background(Color.black)
+} 
 
-	This will create a line in the bottom
+This will create a line in the bottom
 
 After you finish making all the lines you will need to split the view 
 
@@ -75,7 +75,7 @@ This is the main Enum for the logic of the game so it could work.
  Enum Turn  {
         case cross
         case circle
-        
+	
         var buttonText: String {
             switch self {
             case .cross:
@@ -109,30 +109,28 @@ These varibles are really important.
 
 This is an Example of an button .
 
-        	  Button {
-                              toggleTurn()
-                              checkWin()
-                           } label: {
-                               Image(button2ImageName)
-                                    .opacity( button2ImageName.count > 0  ? 1.0 : 0.0)
-                                   .font(.system(size: 60))
-                                    .fontWeight(.heavy)
-                                    .foregroundColor(Color.black)
-                                    .frame(maxWidth: .infinity)
-                                    .frame(height: 100)
-                                    .onTapGesture{
-                                        showText.toggle()
-                                    }
-                                    .animation(.easeIn, value: scale)
-                                
-                            }
-                            .overlay(alignment: .leading) {
-                                Divider()
-                                    .frame(maxWidth: 6, maxHeight: .infinity)
-                                    .background(Color.black)
-                            }
-
-
+Button {
+  toggleTurn()
+  checkWin()
+} label: {
+   Image(button2ImageName)
+        .opacity( button2ImageName.count > 0  ? 1.0 : 0.0)
+       .font(.system(size: 60))
+        .fontWeight(.heavy)
+        .foregroundColor(Color.black)
+        .frame(maxWidth: .infinity)
+        .frame(height: 100)
+        .onTapGesture{
+            showText.toggle()
+        }
+        .animation(.easeIn, value: scale)
+    
+}
+.overlay(alignment: .leading) {
+    Divider()
+        .frame(maxWidth: 6, maxHeight: .infinity)
+        .background(Color.black)
+}
 
 Add all of these requirements and don’t forget to add all the requirements for the label.
 Add 9 of these to create nine buttons.
@@ -142,36 +140,36 @@ Add 9 of these to create nine buttons.
 Now we need to show the win/lose/draw alert. 
 To do this create an alert like this
 
-                    .alert(isPresented: $showAlert, content: {
-                        Alert(title: Text(alertTitle), message: Text("Good job play again"), dismissButton: .default(Text("reset"), action: {
-                            button1ImageName = ""
-                            button2ImageName = ""
-                            button3ImageName = ""
-                            button4ImageName = ""
-                            button5ImageName = ""
-                            button6ImageName = ""
-                            button7ImageName = ""
-                            button8ImageName = ""
-                            button9ImageName = ""
-                            alertTitle = ""
-                        }))
-                    })
-                    .padding(20)
+.alert(isPresented: $showAlert, content: {
+    Alert(title: Text(alertTitle), message: Text("Good job play again"), dismissButton: .default(Text("reset"), action: {
+        button1ImageName = ""
+        button2ImageName = ""
+        button3ImageName = ""
+        button4ImageName = ""
+        button5ImageName = ""
+        button6ImageName = ""
+        button7ImageName = ""
+        button8ImageName = ""
+        button9ImageName = ""
+        alertTitle = ""
+    }))
+})
+.padding(20)
 
 In checkWin create another function.
  
-  func checkAlert(buttonText: String) {
-            if buttonText == Turn.cross.buttonText {
-                alertTitle = "Crosses Win"
-                crossesScore+=1
-            } else if buttonText == Turn.circle.buttonText {
-                alertTitle = "Circles Win"
-                circleScore+=1
-            } else {
-                alertTitle = "Draw"
-            }
-            showAlert = true
-        }
+func checkAlert(buttonText: String) {
+    if buttonText == Turn.cross.buttonText {
+        alertTitle = "Crosses Win"
+        crossesScore+=1
+    } else if buttonText == Turn.circle.buttonText {
+        alertTitle = "Circles Win"
+        circleScore+=1
+    } else {
+        alertTitle = "Draw"
+    }
+    showAlert = true
+}
 
 Now when you win you should get this alert.
 Basically we are calling the alert when we either win or lose after it is called you should
@@ -181,70 +179,70 @@ This should be in your Vstack
 Add the reset button if you didn’t 
 It is really important if you want to reset the game in the middle.
 
-                        Button {
-                            reset()
-                        } label: {
-                            Text("Reset")
-                        }
-                        Spacer()
-                        Text("TicTacToe")
+Button {
+    reset()
+} label: {
+    Text("Reset")
+}
+Spacer()
+Text("TicTacToe")
 
 
 ## Chapter : 4 Themes
 
  Lastly in the top level stack place This
 
-                        Menu {
-                            Menu {
-                                Button("SpiderMan") {
-                                    currentTheme = .SpiderMan
-                                    changeBackground = "SpidermanBackground"
-                                    reset()
-                                }
-                                Button("Avengers") {
-                                    currentTheme = .Avengers
-                                    changeBackground = "IronManBackground"
-                                    reset()
-                                }
-                                Button("Elements") {
-                                    currentTheme = .FireWater
-                                    changeBackground = "FireWaterBackground"
-                                    reset()
-                                }
-                                Button("HarryPotter") {
-                                    currentTheme = .HarryPotter
-                                    changeBackground = "HarryPotterBackground"
-                                    reset()
-                                }
-                                Button("Standard") {
-                                    changeBackground = "StandardBackground"
-                                    currentTheme = .standard
-                                    reset()
-                                }
-                            } label: {
-                                Label("Theme", systemImage: "folder.circle")
-                            }
-                            Button {
-                            } label: {
-                                Text("How It Works")
-                            }
-                            Button {
-                            } label: {
-                                Text("About")
-                            }
-                        } label : {
-                            Spacer()
-                            Label("", systemImage: "ellipsis.circle").padding()
-                        }
-                        Button {
-                            reset()
-                        } label: {
-                            Text("Reset")
-                        }
-                        Spacer()
-                        Text("TicTacToe")
-                            .font(.system(size: 60, weight: .black, design: .serif))
-                    }
+Menu {
+    Menu {
+        Button("SpiderMan") {
+            currentTheme = .SpiderMan
+            changeBackground = "SpidermanBackground"
+            reset()
+        }
+        Button("Avengers") {
+            currentTheme = .Avengers
+            changeBackground = "IronManBackground"
+            reset()
+        }
+        Button("Elements") {
+            currentTheme = .FireWater
+            changeBackground = "FireWaterBackground"
+            reset()
+        }
+        Button("HarryPotter") {
+            currentTheme = .HarryPotter
+            changeBackground = "HarryPotterBackground"
+            reset()
+        }
+        Button("Standard") {
+            changeBackground = "StandardBackground"
+            currentTheme = .standard
+            reset()
+        }
+    } label: {
+        Label("Theme", systemImage: "folder.circle")
+    }
+    Button {
+    } label: {
+        Text("How It Works")
+    }
+    Button {
+    } label: {
+        Text("About")
+    }
+} label : {
+    Spacer()
+    Label("", systemImage: "ellipsis.circle").padding()
+}
+Button {
+    reset()
+} label: {
+    Text("Reset")
+}
+Spacer()
+Text("TicTacToe")
+    .font(.system(size: 60, weight: .black, design: .serif))
+}
 
 Add all this in The top level Vstack for the dropdown button and the themes, but you have to add themes in your assets. 
 
