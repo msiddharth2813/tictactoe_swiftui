@@ -1,6 +1,6 @@
 //
 //  TicTacToeView.swift
-//  TicTaccToe
+//  TicTacToe
 //
 //  Created by siddharth on 10/15/23.
 //
@@ -109,18 +109,11 @@ struct TicTacToeView: View {
             if buttonText == Turn.cross.buttonText {
                 alertTitle = "Crosses Win"
                 crossesScore+=1
-
-          // checking for Cross win
-
             } else if buttonText == Turn.circle.buttonText {
                 alertTitle = "Circles Win"
                 circleScore+=1
-
-          // checking for Circle win
-
             } else {
                 alertTitle = "Draw"
-          // checking for Draw win
             }
             showAlert = true
         }
@@ -472,3 +465,9 @@ struct TicTacToeView: View {
             }
         }
     }
+
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        TicTacToeView()
+    }
+}
