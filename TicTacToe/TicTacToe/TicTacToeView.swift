@@ -9,58 +9,7 @@ import SwiftUI
 
 struct TicTacToeView: View {
     
-    
-    enum Turn {
-        case cross
-        case circle
-        
-        var buttonText: String {
-            switch self {
-            case .cross:
-                return "X"
-            case .circle:
-                return "O"
-            }
-        }
-        func imageName(theme: Theme) -> String {
-            switch self {
-            case .cross:
-                switch theme {
-                case .Avengers:
-                    return "IronMan"
-                case .SpiderMan:
-                    return "SpiderMan"
-                case .FireWater:
-                    return "Fire"
-                case .HarryPotter:
-                    return "HarryPotter"
-                case .standard:
-                    return "X"
-                }
-         
-            case .circle:
-                switch theme {
-                case .Avengers:
-                    return "Thanos"
-                case .SpiderMan:
-                    return "Venom"
-                case .FireWater:
-                    return "Water"
-                case .HarryPotter:
-                    return "Wand"
-                case .standard:
-                    return "O"
-                }
-            }
-        }
-    }
-    enum Theme {
-        case standard
-        case Avengers
-        case SpiderMan
-        case FireWater
-        case HarryPotter
-    }
+    @State private var themeName = "Standard"
     @State private var crossesScore = 0
     @State private var circleScore = 0
     @State private var showAlert = false
@@ -79,6 +28,10 @@ struct TicTacToeView: View {
     @State var currentTurn: Turn = .cross
     @State var currentTheme: Theme = .standard
     @State var changeBackground = "StandardBackground"
+    
+    func themeChanged(to value: String) {
+    }
+    
     
     func toggleTurn() {
         switch currentTurn {
@@ -101,7 +54,7 @@ struct TicTacToeView: View {
         button7ImageName = ""
         button8ImageName = ""
         button9ImageName = ""
-        alertTitle = ""
+        alertTitle = "Game Reset"
     }
     
     func checkWin() {
@@ -165,34 +118,54 @@ struct TicTacToeView: View {
                 VStack(spacing: 0) {
                     VStack(spacing: 0) {
                         Menu {
+                            Picker("Theme", selection: $themeName.onChange(themeChanged)) {
+                                ForEach(Theme.allCases, id: \.self) {
+                                    Text($0.rawValue)
+                                }
+                            }
+                            .pickerStyle(.menu)
+//                            Menu {
+//                                Button("spiderMan") {
+//                                    currentTheme = .SpiderMan
+//                                    changeBackground = "SpidermanBackground"
+//                                    reset()
+//                                }
+//                                Button("Avengers") {
+//                                    currentTheme = .Avengers
+//                                    changeBackground = "IronManBackground"
+//                                    reset()
+//                                }
+//                                Button("Elements") {
+//                                    currentTheme = .FireWater
+//                                    changeBackground = "FireWaterBackground"
+//                                    reset()
+//                                }
+//                                Button("harryPotter") {
+//                                    currentTheme = .HarryPotter
+//                                    changeBackground = "HarryPotterBackground"
+//                                    reset()
+//                                }
+//                                Button("Standard") {
+//                                    changeBackground = "StandardBackground"
+//                                    currentTheme = .standard
+//                                    reset()
+//                                }
+//                            } label: {
+//                                Label("Theme", systemImage: "folder.circle")
+//                            }
                             Menu {
-                                Button("SpiderMan") {
-                                    currentTheme = .SpiderMan
-                                    changeBackground = "SpidermanBackground"
-                                    reset()
-                                }
-                                Button("Avengers") {
-                                    currentTheme = .Avengers
-                                    changeBackground = "IronManBackground"
-                                    reset()
-                                }
-                                Button("Elements") {
-                                    currentTheme = .FireWater
-                                    changeBackground = "FireWaterBackground"
-                                    reset()
-                                }
-                                Button("HarryPotter") {
-                                    currentTheme = .HarryPotter
-                                    changeBackground = "HarryPotterBackground"
-                                    reset()
-                                }
-                                Button("Standard") {
-                                    changeBackground = "StandardBackground"
+                                Button("Two Player") {
                                     currentTheme = .standard
+                                    changeBackground = "StandardBackground"
+                                    reset()
+                                }
+                                Button("Bot vs Player") {
+                                    currentTheme = .standard
+                                    changeBackground = "StandardBackground"
                                     reset()
                                 }
                             } label: {
-                                Label("Theme", systemImage: "folder.circle")
+                                Label("Gamemodes", systemImage: "gamecontroller")
                             }
                             Button {
                             } label: {
@@ -205,16 +178,19 @@ struct TicTacToeView: View {
                         } label : {
                             Spacer()
                             Label("", systemImage: "ellipsis.circle").padding()
+                                .font(.system(size: 20, weight: .black, design: .serif))
                         }
                         Button {
                             reset()
                         } label: {
                             Text("Reset")
+                                .font(.system(size: 30, weight: .black, design: .serif))
                         }
                         Spacer()
                         Text("TicTacToe")
                             .font(.system(size: 60, weight: .black, design: .serif))
                     }
+                    .tint(Color.white)
                     .frame(height: (rect.size.height * 30) / 100) // 30% of the view
                     VStack(spacing: 0) {
                         
@@ -465,6 +441,19 @@ struct TicTacToeView: View {
             }
         }
     }
+
+extension Binding {
+    func onChange(_ handler: @escaping (Value) -> Void) -> Binding<Value> {
+        Binding(
+            get: { self.wrappedValue },
+            set: { newValue in
+                self.wrappedValue = newValue
+                handler(newValue)
+            }
+        )
+    }
+}
+
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
