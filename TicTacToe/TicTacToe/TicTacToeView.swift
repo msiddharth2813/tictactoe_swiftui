@@ -2,19 +2,21 @@
 //  TicTacToeView.swift
 //  TicTacToe
 //
-//  Created by siddharth on 10/15/23.
+//  Created by Siddharth on 10/15/23.
 //
 
 import SwiftUI
 
 struct TicTacToeView: View {
     
-    @State private var themeName = "Standard"
-    @State private var crossesScore = 0
-    @State private var circleScore = 0
+    
+    let themes = [Theme.standard.rawValue, Theme.spiderMan.rawValue, Theme.avengers.rawValue, Theme.harryPotter.rawValue, Theme.fireWater.rawValue]
+    @State private var themeName = Theme.standard.rawValue
+    @State private var mode = GameMode.botVsPlayer.rawValue
+    let modes = [GameMode.twoPlayer.rawValue, GameMode.botVsPlayer.rawValue]
     @State private var showAlert = false
     @State private var alertTitle = ""
-    @State private var button1ImageName = ""
+    @State private var button1ImageName = "" 
     @State private var button2ImageName = ""
     @State private var button3ImageName = ""
     @State private var button4ImageName = ""
@@ -27,20 +29,151 @@ struct TicTacToeView: View {
     @State var showText = true
     @State var currentTurn: Turn = .cross
     @State var currentTheme: Theme = .standard
-    @State var changeBackground = "StandardBackground"
+    @State var currentMode: GameMode = .botVsPlayer
+    @State var currentBackground = "StandardBackground"
+    var gameEngine = TicTacToeGameEngine()
     
     func themeChanged(to value: String) {
+        guard let theme = Theme(rawValue: value) else {
+            return
+        }
+        switch theme {
+        case .standard:
+            currentBackground = "StandardBackground"
+            currentTheme = .standard
+            reset()
+        case .avengers:
+            currentTheme = .avengers
+            currentBackground = "IronManBackground"
+            reset()
+        case .spiderMan:
+            currentTheme = .spiderMan
+            currentBackground = "SpidermanBackground"
+            reset()
+        case .fireWater:
+            currentTheme = .fireWater
+            currentBackground = "FireWaterBackground"
+            reset()
+        case .harryPotter:
+            currentTheme = .harryPotter
+            currentBackground = "HarryPotterBackground"
+            reset()
+        }
+    }
+    
+    func modeChanged(to value: String) {
+        guard let mode = GameMode(rawValue: value) else {
+            return
+        }
+        switch mode {
+        case .twoPlayer:
+            currentMode = .twoPlayer
+            reset()
+        case .botVsPlayer:
+            currentMode = .botVsPlayer
+            reset()
+        }
     }
     
     
-    func toggleTurn() {
-        switch currentTurn {
+    func performNextMove(buttonPos: Int) {
+        func fillImage(buttonPos: Int) {
+            if buttonPos == 1 {
+                button1ImageName = button1ImageName.count == 0 ? currentTurn.imageName(theme: currentTheme) : button1ImageName
+            } else if buttonPos == 2 {
+                button2ImageName = button2ImageName.count == 0 ? currentTurn.imageName(theme: currentTheme) : button2ImageName
+            }  else if buttonPos == 3 {
+                button3ImageName = button3ImageName.count == 0 ? currentTurn.imageName(theme: currentTheme) : button3ImageName
+            }  else if buttonPos == 4 {
+                button4ImageName = button4ImageName.count == 0 ? currentTurn.imageName(theme: currentTheme) : button4ImageName
+            }  else if buttonPos == 5 {
+                button5ImageName = button5ImageName.count == 0 ? currentTurn.imageName(theme: currentTheme) : button5ImageName
+            }  else if buttonPos == 6 {
+                button6ImageName = button6ImageName.count == 0 ? currentTurn.imageName(theme: currentTheme) : button6ImageName
+            }  else if buttonPos == 7 {
+                button7ImageName = button7ImageName.count == 0 ? currentTurn.imageName(theme: currentTheme) : button7ImageName
+            }  else if buttonPos == 8 {
+                button8ImageName = button8ImageName.count == 0 ? currentTurn.imageName(theme: currentTheme) : button8ImageName
+            }  else if buttonPos == 9 {
+                button9ImageName = button9ImageName.count == 0 ? currentTurn.imageName(theme: currentTheme) : button9ImageName
+            }
+        }
+        switch currentMode {
+        case .twoPlayer:
+            fillImage(buttonPos: buttonPos)
+            switch currentTurn {
+            case .cross:
+                currentTurn = .circle
+            case .circle:
+                currentTurn = .cross
+            }
+            let image = currentTurn.image(theme: currentTheme)
+            fillImage(buttonPos: buttonPos)
+            gameEngine.fillImage(buttonPos: buttonPos, image: image)
             
-        case .cross:
-            currentTurn = .circle
+            let won = gameEngine.hasWon(image: image)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                if won.win {
+                    showAlert(buttonText: image.rawValue)
+                } else if won.draw {
+                    showAlert(buttonText: "")
+                }
+            }
             
-        case .circle:
-            currentTurn = .cross
+        case .botVsPlayer:
+            switch currentTurn {
+            case .cross:
+                let image = currentTurn.image(theme: currentTheme)
+                fillImage(buttonPos: buttonPos)
+                gameEngine.fillImage(buttonPos: buttonPos, image: image)
+                
+                let won = gameEngine.hasWon(image: image)
+                if won.win {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        showAlert(buttonText: image.rawValue)
+                    }
+                    return
+                } else if won.draw {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        showAlert(buttonText: "")
+                    }
+                    return
+                }
+                
+                // determine bot's next move
+                currentTurn = .circle
+                let circleImage = Turn.circle.image(theme: currentTheme)
+                // check if there is win move for circle
+                var nextButtonPosition = gameEngine.nextMove(buttonPosition: buttonPos, image: circleImage)
+                if nextButtonPosition == -1 {
+                    // check if we need to block cross winning
+                    let crossImage = Turn.cross.image(theme: currentTheme)
+                    nextButtonPosition = gameEngine.nextMove(buttonPosition: buttonPos, image: crossImage)
+                }
+                // No position to block
+                if nextButtonPosition == -1 {
+                    // next free move.
+                    nextButtonPosition = gameEngine.nextFreeMove(buttonPos: buttonPos)                }
+                // check if there is win move for circle
+                gameEngine.fillImage(buttonPos: nextButtonPosition, image: circleImage)
+
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                    fillImage(buttonPos: nextButtonPosition)
+                    currentTurn = .cross
+                    let won = gameEngine.hasWon(image: circleImage)
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        if won.win {
+                            showAlert(buttonText: circleImage.rawValue)
+                        } else if won.draw {
+                            showAlert(buttonText: "")
+                        }
+                    }
+                }
+            case .circle:
+                break
+                //fillImage(buttonPos: buttonPos)
+//                gameEngine.nextMove(buttonPosition: buttonPos)
+            }
         }
     }
     
@@ -55,118 +188,57 @@ struct TicTacToeView: View {
         button8ImageName = ""
         button9ImageName = ""
         alertTitle = "Game Reset"
+        currentTurn = .cross
+        gameEngine.reset()
     }
     
-    func checkWin() {
-        func checkAlert(buttonText: String) {
-            if buttonText == Turn.cross.buttonText {
-                alertTitle = "Crosses Win"
-                crossesScore+=1
-            } else if buttonText == Turn.circle.buttonText {
-                alertTitle = "Circles Win"
-                circleScore+=1
-            } else {
-                alertTitle = "Draw"
-            }
-            showAlert = true
+    func showAlert(buttonText: String) {
+        if buttonText == Turn.cross.buttonText {
+            alertTitle = "Crosses Win"
+        } else if buttonText == Turn.circle.buttonText {
+            alertTitle = "Circles Win"
+        } else if buttonText == TicTacToeImage.ironman.rawValue {
+            alertTitle = "Iron Man Won"
+        } else if buttonText == TicTacToeImage.spiderMan.rawValue {
+            alertTitle = "Spider Man Won"
+        } else if buttonText == TicTacToeImage.fire.rawValue {
+            alertTitle = "Fire Won"
+        } else if buttonText == TicTacToeImage.thanos.rawValue {
+            alertTitle = "Thanos Won"
+        } else if buttonText == TicTacToeImage.water.rawValue {
+            alertTitle = "Water Won"
+        } else if buttonText == TicTacToeImage.wand.rawValue {
+            alertTitle = "Wand Won"
+        } else if buttonText == TicTacToeImage.venom.rawValue {
+            alertTitle = "Venom Won"
+        } else if buttonText == TicTacToeImage.harryPotter.rawValue {
+            alertTitle = "Harry Won"
+        } else {
+            alertTitle = "Draw"
         }
-        // checking for horizontal button 1,2,3
-        if !button1ImageName.isEmpty && !button2ImageName.isEmpty && !button3ImageName.isEmpty && button1ImageName == button2ImageName && button2ImageName == button3ImageName {
-            checkAlert(buttonText: button1ImageName)
-        }
-        // checking for horizontal button 4,5,6
-        else if !button4ImageName.isEmpty && !button5ImageName.isEmpty && !button6ImageName.isEmpty && button4ImageName == button5ImageName && button5ImageName == button6ImageName {
-            checkAlert(buttonText: button4ImageName)
-        }
-        // checking for horizontal button 7,8,9
-        else if !button7ImageName.isEmpty && !button8ImageName.isEmpty && !button9ImageName.isEmpty && button7ImageName == button8ImageName && button8ImageName == button9ImageName {
-            checkAlert(buttonText: button7ImageName)
-        }
-        // checking for vertical button 1,4,7
-        else if !button1ImageName.isEmpty && !button4ImageName.isEmpty && !button7ImageName.isEmpty && button1ImageName == button4ImageName && button4ImageName == button7ImageName  {
-            checkAlert(buttonText: button1ImageName)
-        }
-        // checking for vertical button 3,6,9
-        else if !button3ImageName.isEmpty && !button6ImageName.isEmpty && !button9ImageName.isEmpty && button3ImageName == button6ImageName && button6ImageName == button9ImageName  {
-            checkAlert(buttonText: button3ImageName)
-        }
-        // checking for vertical button 2,5,8
-        else if !button2ImageName.isEmpty && !button5ImageName.isEmpty && !button8ImageName.isEmpty && button2ImageName == button5ImageName && button5ImageName == button8ImageName {
-            checkAlert(buttonText: button2ImageName)
-        }
-        // checking for diagonal button 1,5,9
-        else if !button1ImageName.isEmpty && !button5ImageName.isEmpty && !button9ImageName.isEmpty && button1ImageName == button5ImageName && button5ImageName == button9ImageName  {
-            checkAlert(buttonText: button1ImageName)
-        }
-        // checking for diagonal button 7,5,3
-        else if !button7ImageName.isEmpty && !button5ImageName.isEmpty && !button3ImageName.isEmpty && button7ImageName == button5ImageName && button5ImageName == button3ImageName  {
-            checkAlert(buttonText: button7ImageName)
-        }
-        // checking for draw
-        else if !button1ImageName.isEmpty && !button2ImageName.isEmpty && !button3ImageName.isEmpty && !button4ImageName.isEmpty && !button5ImageName.isEmpty && !button6ImageName.isEmpty && !button7ImageName.isEmpty && !button8ImageName.isEmpty && !button9ImageName.isEmpty{
-            checkAlert(buttonText: "")
-        }
+        showAlert = true
     }
-  
+    
     var body: some View {
-        
         GeometryReader { rect in
             ZStack(alignment: Alignment(horizontal: .center, vertical: .center)) {
-                Image(changeBackground)
+                Image(currentBackground)
                     .resizable()
                     .edgesIgnoringSafeArea(.all)
                 VStack(spacing: 0) {
                     VStack(spacing: 0) {
                         Menu {
                             Picker("Theme", selection: $themeName.onChange(themeChanged)) {
-                                ForEach(Theme.allCases, id: \.self) {
-                                    Text($0.rawValue)
+                                ForEach(themes, id: \.self) {
+                                    Text($0)
+                                }
+                            }.pickerStyle(.menu)
+                            Picker("Game Mode", selection: $mode.onChange(modeChanged)) {
+                                ForEach(modes, id: \.self) {
+                                    Text($0)
                                 }
                             }
                             .pickerStyle(.menu)
-//                            Menu {
-//                                Button("spiderMan") {
-//                                    currentTheme = .SpiderMan
-//                                    changeBackground = "SpidermanBackground"
-//                                    reset()
-//                                }
-//                                Button("Avengers") {
-//                                    currentTheme = .Avengers
-//                                    changeBackground = "IronManBackground"
-//                                    reset()
-//                                }
-//                                Button("Elements") {
-//                                    currentTheme = .FireWater
-//                                    changeBackground = "FireWaterBackground"
-//                                    reset()
-//                                }
-//                                Button("harryPotter") {
-//                                    currentTheme = .HarryPotter
-//                                    changeBackground = "HarryPotterBackground"
-//                                    reset()
-//                                }
-//                                Button("Standard") {
-//                                    changeBackground = "StandardBackground"
-//                                    currentTheme = .standard
-//                                    reset()
-//                                }
-//                            } label: {
-//                                Label("Theme", systemImage: "folder.circle")
-//                            }
-                            Menu {
-                                Button("Two Player") {
-                                    currentTheme = .standard
-                                    changeBackground = "StandardBackground"
-                                    reset()
-                                }
-                                Button("Bot vs Player") {
-                                    currentTheme = .standard
-                                    changeBackground = "StandardBackground"
-                                    reset()
-                                }
-                            } label: {
-                                Label("Gamemodes", systemImage: "gamecontroller")
-                            }
                             Button {
                             } label: {
                                 Text("How It Works")
@@ -180,6 +252,9 @@ struct TicTacToeView: View {
                             Label("", systemImage: "ellipsis.circle").padding()
                                 .font(.system(size: 20, weight: .black, design: .serif))
                         }
+                        Text("TicTacToe")
+                            .font(.system(size: 60, weight: .black, design: .serif))
+                            .foregroundColor(Color.white)
                         Button {
                             reset()
                         } label: {
@@ -187,18 +262,16 @@ struct TicTacToeView: View {
                                 .font(.system(size: 30, weight: .black, design: .serif))
                         }
                         Spacer()
-                        Text("TicTacToe")
-                            .font(.system(size: 60, weight: .black, design: .serif))
+                        Text("\(mode)")
+                            .foregroundColor(Color.white)
+                            .font(.system(size: 22, weight: .black, design: .serif))
                     }
                     .tint(Color.white)
                     .frame(height: (rect.size.height * 30) / 100) // 30% of the view
                     VStack(spacing: 0) {
-                        
                         HStack(spacing: 0) {
                             Button {
-                                button1ImageName = button1ImageName.count == 0 ? currentTurn.imageName(theme: currentTheme) : button1ImageName
-                                toggleTurn()
-                                checkWin()
+                                performNextMove(buttonPos: 1)
                             } label: {
                                 Image(button1ImageName)
                                     .opacity( button1ImageName.count > 0  ? 1.0 : 0.0)
@@ -206,7 +279,7 @@ struct TicTacToeView: View {
                                     .fontWeight(.heavy)
                                     .frame(maxWidth: .infinity)
                                     .frame(height: 100)
-                                    .foregroundColor(Color.black)
+                                    .foregroundColor(Color.white)
                                     .onTapGesture{
                                         showText.toggle()
                                     }
@@ -214,15 +287,13 @@ struct TicTacToeView: View {
                             }
                             
                             Button {
-                                button2ImageName = button2ImageName.count == 0 ? currentTurn.imageName(theme: currentTheme) : button2ImageName
-                                toggleTurn()
-                                checkWin()
+                                performNextMove(buttonPos: 2)
                             } label: {
                                 Image(button2ImageName)
                                     .opacity( button2ImageName.count > 0  ? 1.0 : 0.0)
                                     .font(.system(size: 60))
                                     .fontWeight(.heavy)
-                                    .foregroundColor(Color.black)
+                                    .foregroundColor(Color.white)
                                     .frame(maxWidth: .infinity)
                                     .frame(height: 100)
                                     .onTapGesture{
@@ -234,19 +305,17 @@ struct TicTacToeView: View {
                             .overlay(alignment: .leading) {
                                 Divider()
                                     .frame(maxWidth: 6, maxHeight: .infinity)
-                                    .background(Color.black)
+                                    .background(Color.white)
                             }
                             
                             Button {
-                                button3ImageName = button3ImageName.count == 0 ? currentTurn.imageName(theme: currentTheme) : button3ImageName
-                                toggleTurn()
-                                checkWin()
+                                performNextMove(buttonPos: 3)
                             } label: {
                                 Image(button3ImageName)
                                     .opacity( button3ImageName.count > 0  ? 1.0 : 0.0)
                                     .font(.system(size: 60))
                                     .fontWeight(.heavy)
-                                    .foregroundColor(Color.black)
+                                    .foregroundColor(Color.white)
                                     .frame(maxWidth: .infinity)
                                     .frame(height: 100)
                                     .onTapGesture{
@@ -257,19 +326,17 @@ struct TicTacToeView: View {
                             .overlay(alignment: .leading) {
                                 Divider()
                                     .frame(maxWidth: 6, maxHeight:.infinity)
-                                    .background(Color.black)
+                                    .background(Color.white)
                             }
                         }
                         HStack(spacing: 0) {
                             Button {
-                                button4ImageName = button4ImageName.count == 0 ? currentTurn.imageName(theme: currentTheme) : button4ImageName
-                                toggleTurn()
-                                checkWin()
+                                performNextMove(buttonPos: 4)
                             } label: {
                                 Image(button4ImageName)
                                     .opacity(button4ImageName.count > 0  ? 1.0 : 0.0)                                .font(.system(size: 60))
                                     .fontWeight(.heavy)
-                                    .foregroundColor(Color.black)
+                                    .foregroundColor(Color.white)
                                     .frame(maxWidth: .infinity)
                                     .frame(height: 100)
                                     .onTapGesture{
@@ -280,24 +347,22 @@ struct TicTacToeView: View {
                             .overlay(alignment: .topTrailing) {
                                 Divider()
                                     .frame(maxWidth: .infinity, maxHeight:6)
-                                    .background(Color.black)
+                                    .background(Color.white)
                             }
                             .overlay(alignment: .bottomTrailing) {
                                 Divider()
                                     .frame(maxWidth: .infinity, maxHeight:6)
-                                    .background(Color.black)
+                                    .background(Color.white)
                             }
                             
                             Button {
-                                button5ImageName = button5ImageName.count == 0 ? currentTurn.imageName(theme: currentTheme) : button5ImageName
-                                toggleTurn()
-                                checkWin()
+                                performNextMove(buttonPos: 5)
                             } label: {
                                 Image(button5ImageName)
                                     .opacity(button5ImageName.count > 0  ? 1.0 : 0.0)
                                     .font(.system(size: 60))
                                     .fontWeight(.heavy)
-                                    .foregroundColor(Color.black)
+                                    .foregroundColor(Color.white)
                                     .frame(maxWidth: .infinity)
                                     .frame(height: 100)
                                     .onTapGesture{
@@ -309,29 +374,27 @@ struct TicTacToeView: View {
                             .overlay(alignment: .leading) {
                                 Divider()
                                     .frame(maxWidth: 6, maxHeight:.infinity)
-                                    .background(Color.black)
+                                    .background(Color.white)
                             }
                             .overlay(alignment: .bottomTrailing) {
                                 Divider()
                                     .frame(maxWidth: .infinity, maxHeight:6)
-                                    .background(Color.black)
+                                    .background(Color.white)
                             }
                             .overlay(alignment: .topTrailing) {
                                 Divider()
                                     .frame(maxWidth: .infinity, maxHeight:6)
-                                    .background(Color.black)
+                                    .background(Color.white)
                             }
                             
                             Button {
-                                button6ImageName = button6ImageName.count == 0 ? currentTurn.imageName(theme: currentTheme) : button6ImageName
-                                toggleTurn()
-                                checkWin()
+                                performNextMove(buttonPos: 6)
                             } label: {
                                 Image(button6ImageName)
                                     .opacity(button6ImageName.count > 0  ? 1.0 : 0.0)
                                     .font(.system(size: 60))
                                     .fontWeight(.heavy)
-                                    .foregroundColor(Color.black)
+                                    .foregroundColor(Color.white)
                                     .frame(maxWidth: .infinity)
                                     .frame(height: 100)
                                     .onTapGesture{
@@ -342,29 +405,27 @@ struct TicTacToeView: View {
                             .overlay(alignment: .leading) {
                                 Divider()
                                     .frame(maxWidth: 6, maxHeight:.infinity)
-                                    .background(Color.black)
+                                    .background(Color.white)
                             }
                             .overlay(alignment: .bottomLeading ) {
                                 Divider()
                                     .frame(maxWidth: .infinity, maxHeight:6)
-                                    .background(Color.black)
+                                    .background(Color.white)
                             }
                             .overlay(alignment: .topTrailing) {
                                 Divider()
                                     .frame(maxWidth: .infinity, maxHeight:6)
-                                    .background(Color.black)
+                                    .background(Color.white)
                             }
                         }
                         HStack(spacing: 0) {
                             Button {
-                                button7ImageName = button7ImageName.count == 0 ? currentTurn.imageName(theme: currentTheme) : button7ImageName
-                                toggleTurn()
-                                checkWin()
+                                performNextMove(buttonPos: 7)
                             } label: {
                                 Image(button7ImageName)
                                     .opacity(button7ImageName.count > 0  ? 1.0 : 0.0)                                .font(.system(size: 60))
                                     .fontWeight(.heavy)
-                                    .foregroundColor(Color.black)
+                                    .foregroundColor(Color.white)
                                     .frame(maxWidth: .infinity)
                                     .frame(height: 100)
                                     .onTapGesture{
@@ -373,14 +434,12 @@ struct TicTacToeView: View {
                                     .animation(.easeIn, value: scale)
                             }
                             Button {
-                                button8ImageName = button8ImageName.count == 0 ? currentTurn.imageName(theme: currentTheme) : button8ImageName
-                                toggleTurn()
-                                checkWin()
+                                performNextMove(buttonPos: 8)
                             } label: {
                                 Image(button8ImageName)
                                     .opacity(button8ImageName.count > 0  ? 1.0 : 0.0)                                .font(.system(size: 60))
                                     .fontWeight(.heavy)
-                                    .foregroundColor(Color.black)
+                                    .foregroundColor(Color.white)
                                     .frame(maxWidth: .infinity)
                                     .frame(height: 100)
                                     .onTapGesture{
@@ -392,17 +451,16 @@ struct TicTacToeView: View {
                             .overlay(alignment: .leading) {
                                 Divider()
                                     .frame(maxWidth: 6, maxHeight:.infinity)
-                                    .background(Color.black)
+                                    .background(Color.white)
                             }
                             Button {
-                                button9ImageName = button9ImageName.count == 0 ? currentTurn.imageName(theme: currentTheme) : button9ImageName
-                                toggleTurn()
-                                checkWin()
+                                performNextMove(buttonPos: 9)
                             } label: {
                                 Image(button9ImageName)
-                                    .opacity(button9ImageName.count > 0  ? 1.0 : 0.0)                                .font(.system(size: 60))
+                                    .opacity(button9ImageName.count > 0  ? 1.0 : 0.0)
+                                    .font(.system(size: 60))
                                     .fontWeight(.heavy)
-                                    .foregroundColor(Color.black)
+                                    .foregroundColor(Color.white)
                                     .frame(maxWidth: .infinity)
                                     .frame(height: 100)
                                     .onTapGesture{
@@ -414,33 +472,23 @@ struct TicTacToeView: View {
                             .overlay(alignment: .leading) {
                                 Divider()
                                     .frame(maxWidth: 6, maxHeight:.infinity)
-                                    .background(Color.black)
+                                    .background(Color.white)
                             }
                         }
                     }// Top level vstack ending
                     .frame(height: (rect.size.height * 50) / 100) // 70% of the view
-                    
                     .alert(isPresented: $showAlert, content: {
                         Alert(title: Text(alertTitle), message: Text("Good job play again"), dismissButton: .default(Text("reset"), action: {
-                            button1ImageName = ""
-                            button2ImageName = ""
-                            button3ImageName = ""
-                            button4ImageName = ""
-                            button5ImageName = ""
-                            button6ImageName = ""
-                            button7ImageName = ""
-                            button8ImageName = ""
-                            button9ImageName = ""
-                            alertTitle = ""
+                            reset()
                         }))
                     })
                     .padding(20)
-                    
-                }
-            }
+                            
+                        }
+                    }
             }
         }
-    }
+}
 
 extension Binding {
     func onChange(_ handler: @escaping (Value) -> Void) -> Binding<Value> {
@@ -460,3 +508,4 @@ struct ContentView_Previews: PreviewProvider {
         TicTacToeView()
     }
 }
+  
