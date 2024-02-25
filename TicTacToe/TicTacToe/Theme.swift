@@ -1,8 +1,8 @@
 //
 //  Theme.swift
-//  TicTaccToe
+//  TicTacToe
 //
-//  Created by siddharth on 2/12/24.
+//  Created by Siddharth on 2/12/24.
 //
 
 import Foundation

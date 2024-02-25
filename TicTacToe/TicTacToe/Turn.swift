@@ -1,8 +1,8 @@
 //
 //  Turn.swift
-//  TicTaccToe
+//  TicTacToe
 //
-//  Created by siddharth on 2/12/24.
+//  Created by Siddharth on 2/12/24.
 //
 
 import Foundation
@@ -19,34 +19,65 @@ enum Turn {
             return "O"
         }
     }
-    func imageName(theme: Theme) -> String {
+    func image(theme: Theme) -> TicTacToeImage {
         switch self {
         case .cross:
             switch theme {
             case .avengers:
-                return "IronMan"
+                return .ironman
             case .spiderMan:
-                return "SpiderMan"
+                return .spiderMan
             case .fireWater:
-                return "Fire"
+                return .fire
             case .harryPotter:
-                return "harryPotter"
+                return .harryPotter
             case .standard:
-                return "X"
+                return .X
             }
      
         case .circle:
             switch theme {
             case .avengers:
-                return "Thanos"
+                return .thanos
             case .spiderMan:
-                return "Venom"
+                return .venom
             case .fireWater:
-                return "Water"
+                return .water
             case .harryPotter:
-                return "Wand"
+                return .wand
             case .standard:
-                return "O"
+                return .O
+            }
+        }
+    }
+    func imageName(theme: Theme) -> String {
+        switch self {
+        case .cross:
+            switch theme {
+            case .avengers:
+                return TicTacToeImage.ironman.rawValue
+            case .spiderMan:
+                return TicTacToeImage.spiderMan.rawValue
+            case .fireWater:
+                return TicTacToeImage.fire.rawValue
+            case .harryPotter:
+                return TicTacToeImage.harryPotter.rawValue
+            case .standard:
+                return TicTacToeImage.X.rawValue
+            }
+     
+        case .circle:
+            switch theme {
+            case .avengers:
+                return TicTacToeImage.thanos.rawValue
+            case .spiderMan:
+                return TicTacToeImage.venom.rawValue
+            case .fireWater:
+                return TicTacToeImage.water.rawValue
+            case .harryPotter:
+                return TicTacToeImage.wand.rawValue
+            case .standard:
+                return TicTacToeImage.O.rawValue
             }
         }
     }
