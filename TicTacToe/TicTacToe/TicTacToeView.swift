@@ -8,15 +8,15 @@
 import SwiftUI
 
 struct TicTacToeView: View {
-    
-    
+    let modes = [GameMode.twoPlayer.rawValue, GameMode.botVsPlayer.rawValue]
     let themes = [Theme.standard.rawValue, Theme.spiderMan.rawValue, Theme.avengers.rawValue, Theme.harryPotter.rawValue, Theme.fireWater.rawValue]
+    @State private var confettiVisible = false
+    @State private var alertInfo: AlertInfo?
     @State private var themeName = Theme.standard.rawValue
     @State private var mode = GameMode.botVsPlayer.rawValue
-    let modes = [GameMode.twoPlayer.rawValue, GameMode.botVsPlayer.rawValue]
-    @State private var showAlert = false
     @State private var alertTitle = ""
-    @State private var button1ImageName = "" 
+    @State private var counter: Int = 0
+    @State private var button1ImageName = ""
     @State private var button2ImageName = ""
     @State private var button3ImageName = ""
     @State private var button4ImageName = ""
@@ -75,7 +75,6 @@ struct TicTacToeView: View {
         }
     }
     
-    
     func performNextMove(buttonPos: Int) {
         func fillImage(buttonPos: Int) {
             if buttonPos == 1 {
@@ -100,13 +99,6 @@ struct TicTacToeView: View {
         }
         switch currentMode {
         case .twoPlayer:
-            fillImage(buttonPos: buttonPos)
-            switch currentTurn {
-            case .cross:
-                currentTurn = .circle
-            case .circle:
-                currentTurn = .cross
-            }
             let image = currentTurn.image(theme: currentTheme)
             fillImage(buttonPos: buttonPos)
             gameEngine.fillImage(buttonPos: buttonPos, image: image)
@@ -119,7 +111,12 @@ struct TicTacToeView: View {
                     showAlert(buttonText: "")
                 }
             }
-            
+            switch currentTurn {
+            case .cross:
+                currentTurn = .circle
+            case .circle:
+                currentTurn = .cross
+            }
         case .botVsPlayer:
             switch currentTurn {
             case .cross:
@@ -131,6 +128,7 @@ struct TicTacToeView: View {
                 if won.win {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                         showAlert(buttonText: image.rawValue)
+                        counter += 1
                     }
                     return
                 } else if won.draw {
@@ -164,6 +162,7 @@ struct TicTacToeView: View {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                         if won.win {
                             showAlert(buttonText: circleImage.rawValue)
+                            counter += 1
                         } else if won.draw {
                             showAlert(buttonText: "")
                         }
@@ -171,8 +170,6 @@ struct TicTacToeView: View {
                 }
             case .circle:
                 break
-                //fillImage(buttonPos: buttonPos)
-//                gameEngine.nextMove(buttonPosition: buttonPos)
             }
         }
     }
@@ -216,7 +213,17 @@ struct TicTacToeView: View {
         } else {
             alertTitle = "Draw"
         }
-        showAlert = true
+        alertInfo = AlertInfo(
+             id: .winLose,
+             title: alertTitle,
+             message: "Good job play again"
+        )
+        if alertTitle != "Draw" {
+            confettiVisible = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                confettiVisible = false
+            }
+        }
     }
     
     var body: some View {
@@ -225,6 +232,7 @@ struct TicTacToeView: View {
                 Image(currentBackground)
                     .resizable()
                     .edgesIgnoringSafeArea(.all)
+                    .blur(radius: 0.5)
                 VStack(spacing: 0) {
                     VStack(spacing: 0) {
                         Menu {
@@ -240,12 +248,12 @@ struct TicTacToeView: View {
                             }
                             .pickerStyle(.menu)
                             Button {
+                                alertInfo = AlertInfo(
+                                  id: .howToPlay,
+                                  title: "HowToPlay",
+                                  message: "1.You are X , your friend (or the computer) is O. \n 2.Players take turns putting their marks in empty squares. \n 3.The first player to get 3 of her marks in a row (up, down, across, or diagonally) is the winner. \n 4.When all 9 squares are full, the game is over.")
                             } label: {
                                 Text("How It Works")
-                            }
-                            Button {
-                            } label: {
-                                Text("About")
                             }
                         } label : {
                             Spacer()
@@ -284,6 +292,7 @@ struct TicTacToeView: View {
                                         showText.toggle()
                                     }
                                     .animation(.easeInOut, value: scale)
+                                    
                             }
                             
                             Button {
@@ -334,7 +343,8 @@ struct TicTacToeView: View {
                                 performNextMove(buttonPos: 4)
                             } label: {
                                 Image(button4ImageName)
-                                    .opacity(button4ImageName.count > 0  ? 1.0 : 0.0)                                .font(.system(size: 60))
+                                    .opacity(button4ImageName.count > 0  ? 1.0 : 0.0)
+                                    .font(.system(size: 60))
                                     .fontWeight(.heavy)
                                     .foregroundColor(Color.white)
                                     .frame(maxWidth: .infinity)
@@ -423,7 +433,8 @@ struct TicTacToeView: View {
                                 performNextMove(buttonPos: 7)
                             } label: {
                                 Image(button7ImageName)
-                                    .opacity(button7ImageName.count > 0  ? 1.0 : 0.0)                                .font(.system(size: 60))
+                                    .opacity(button7ImageName.count > 0  ? 1.0 : 0.0)
+                                    .font(.system(size: 60))
                                     .fontWeight(.heavy)
                                     .foregroundColor(Color.white)
                                     .frame(maxWidth: .infinity)
@@ -437,7 +448,8 @@ struct TicTacToeView: View {
                                 performNextMove(buttonPos: 8)
                             } label: {
                                 Image(button8ImageName)
-                                    .opacity(button8ImageName.count > 0  ? 1.0 : 0.0)                                .font(.system(size: 60))
+                                    .opacity(button8ImageName.count > 0  ? 1.0 : 0.0)
+                                    .font(.system(size: 60))
                                     .fontWeight(.heavy)
                                     .foregroundColor(Color.white)
                                     .frame(maxWidth: .infinity)
@@ -476,16 +488,33 @@ struct TicTacToeView: View {
                             }
                         }
                     }// Top level vstack ending
+                    .withConfetti(isVisible: $confettiVisible)
                     .frame(height: (rect.size.height * 50) / 100) // 70% of the view
-                    .alert(isPresented: $showAlert, content: {
-                        Alert(title: Text(alertTitle), message: Text("Good job play again"), dismissButton: .default(Text("reset"), action: {
-                            reset()
-                        }))
+                    .alert(item: $alertInfo, content: { alertInfo in
+                        let dismissButtonText: String = {
+                            switch alertInfo.id {
+                            case .howToPlay:
+                                return "OK"
+                            case .winLose:
+                                return "Reset"
+                            }
+                        }()
+                         return Alert(
+                            title: Text(alertInfo.title),
+                            message: Text(alertInfo.message),
+                            dismissButton: .default(Text(dismissButtonText), action: {
+                                switch alertInfo.id {
+                                case .howToPlay:
+                                    break
+                                case .winLose:
+                                    reset()
+                                }
+                            })
+                         )
                     })
                     .padding(20)
-                            
-                        }
                     }
+                }
             }
         }
 }

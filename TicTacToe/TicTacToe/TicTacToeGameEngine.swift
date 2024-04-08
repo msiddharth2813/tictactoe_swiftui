@@ -8,6 +8,8 @@
 import Foundation
 import UIKit
 
+
+
 class TicTacToeGameEngine  {
 
     ///
@@ -222,6 +224,17 @@ class TicTacToeGameEngine  {
         } else if positions[0][2] == positions[2][2] && positions[0][2] == image {
             if positions[1][2] == TicTacToeImage.unnamed6 {
                 return convertArrayIndexToButtonPosition((1, 2))
+            }
+        }
+        
+        // Diagonal middle cases
+        if positions[0][0] == positions[2][2] && positions[0][0] == image {
+            if positions[1][1] == TicTacToeImage.unnamed5 {
+                return convertArrayIndexToButtonPosition((1, 1))
+            }
+        } else if positions[0][2] == positions[2][0] && positions[0][2] == image {
+            if positions[1][1] == TicTacToeImage.unnamed5 {
+                return convertArrayIndexToButtonPosition((1, 1))
             }
         }
         
