@@ -9,8 +9,8 @@ import Foundation
 
 enum Theme : String, CaseIterable{
     case standard = "Standard"
-    case avengers = "Avengers"
-    case spiderMan = "SpiderMan"
-    case fireWater = "FireWater"
-    case harryPotter = "HarryPotter"
+    case avengers = "Baseball"
+    case spiderMan = "Pets"
+    case fireWater = "Fire Water"
+    case harryPotter = "Winter"
 }

@@ -191,25 +191,25 @@ struct TicTacToeView: View {
     
     func showAlert(buttonText: String) {
         if buttonText == Turn.cross.buttonText {
-            alertTitle = "Crosses Win"
+            alertTitle = "Crosses Wins"
         } else if buttonText == Turn.circle.buttonText {
-            alertTitle = "Circles Win"
+            alertTitle = "Circles Wins"
         } else if buttonText == TicTacToeImage.ironman.rawValue {
-            alertTitle = "Iron Man Won"
+            alertTitle = "Baseball Bat Wins"
         } else if buttonText == TicTacToeImage.spiderMan.rawValue {
-            alertTitle = "Spider Man Won"
+            alertTitle = "Dog Wins"
         } else if buttonText == TicTacToeImage.fire.rawValue {
-            alertTitle = "Fire Won"
+            alertTitle = "Fire Wins"
         } else if buttonText == TicTacToeImage.thanos.rawValue {
-            alertTitle = "Thanos Won"
+            alertTitle = "Baseball Ball Wins"
         } else if buttonText == TicTacToeImage.water.rawValue {
-            alertTitle = "Water Won"
+            alertTitle = "Water Wins"
         } else if buttonText == TicTacToeImage.wand.rawValue {
-            alertTitle = "Wand Won"
+            alertTitle = "Snowman Wins"
         } else if buttonText == TicTacToeImage.venom.rawValue {
-            alertTitle = "Venom Won"
+            alertTitle = "Cat Wins"
         } else if buttonText == TicTacToeImage.harryPotter.rawValue {
-            alertTitle = "Harry Won"
+            alertTitle = "Snow Wins"
         } else {
             alertTitle = "Draw"
         }
